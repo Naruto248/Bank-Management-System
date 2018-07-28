@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:user-service>
+				<security:user name="admin" authorities="admin" password="1234" />
+			</security:user-service>
+		</security:authentication-provider>
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="dataSource"
+				id="jdbcauth" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+	<security:http>
+		<security:form-login login-page="/login"
+			authentication-failure-url="/login?status=incorrect" />
+		<security:logout logout-url="/logout" logout-success-url="/" />
+		<security:csrf disabled="true" />
+		
+		<security:intercept-url pattern="/cms/**" access="hasAnyAuthority('admin', 'executive')" />
+		<security:intercept-url pattern="/LoanProcess" access="hasAuthority('executive')" />
+		<security:intercept-url pattern="/AccountCreation" access="hasAnyAuthority('manager', 'executive')" />
+		<security:intercept-url pattern="/CustomerSearch" access="hasAnyAuthority('manager', 'executive', 'clerk')" />
+		<security:intercept-url pattern="/Transaction" access="hasAnyAuthority('manager', 'executive', 'clerk')" />
+		<security:intercept-url pattern="/" access="permitAll" />
+
+		<security:access-denied-handler error-page="/accessDenied.jsp" />			
+	</security:http>
+</beans>
